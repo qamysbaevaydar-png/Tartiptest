@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TARTIP — 28-Күндік Жүйе</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script type="module" src="https://unpkg.com/@lottiefiles/dotlottie-wc@latest/dist/dotlottie-wc.js"></script>
+  <style>
+    :root {
+      --bg-dark: #111315;
+      --bg-card: #181b1e;
+      --bg-light: #F4F3EF;
+      --accent: #C5F36B;
+      --text-main: #F4F3EF;
+      --text-muted: #9aa0a6;
+      --text-dark: #111315;
+      --border: rgba(244, 243, 239, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      padding: 20px 16px 104px;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      max-width: 440px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Артқы жұмсақ лайм/неон жарық сәулесі */
+    .ambient-glow {
+      position: fixed;
+      top: -80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 360px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(197, 243, 107, 0.26) 0%, rgba(197, 243, 107, 0) 70%);
+      filter: blur(26px);
+      pointer-events: none;
+      z-index: 0;
+      animation: pulseGlow 3.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+      0% { opacity: 0.55; transform: translateX(-50%) scale(0.95); }
+      100% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      border-radius: 10px;
+      filter: drop-shadow(0 0 10px rgba(197, 243, 107, 0.35));
+    }
+
+    .brand-badge {
+      background: var(--accent);
+      color: var(--text-dark);
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      padding: 5px 10px;
+      border-radius: 999px;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .day-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-icon {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+    }
+
+    .hero-card {
+      position: relative;
+      z-index: 1;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      border-radius: 24px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+      overflow: hidden;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .hero-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.65;
+    }
+
+    .streak-tag {
+      background: var(--bg-dark);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .progress-percent {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .progress-sub {
+      font-size: 13px;
+      opacity: 0.75;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(17, 19, 21, 0.12);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--bg-dark);
+      border-radius: 999px;
+      transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .pillars-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .pillar-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 14px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .pillar-card::before {
+      content: "";
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(197, 243, 107, 0.22), transparent 70%);
+      pointer-events: none;
+    }
+
+    .pillar-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(197, 243, 107, 0.45);
+      box-shadow: 0 8px 24px rgba(197, 243, 107, 0.12);
+    }
+
+    .pillar-card.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 24px rgba(197, 243, 107, 0.2);
+    }
+
+    /* Стикер + жарық эффекті */
+    .sticker-slot {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 8px;
+      border-radius: 18px;
+      background: radial-gradient(circle at 35% 25%, rgba(197, 243, 107, 0.3), rgba(255, 255, 255, 0.03));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      animation: floatSticker 3.2s ease-in-out infinite;
+    }
+
+    .pillar-card:nth-child(2) .sticker-slot { animation-delay: 0.45s; }
+    .pillar-card:nth-child(3) .sticker-slot { animation-delay: 0.9s; }
+
+    .sticker-slot img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 12px rgba(197, 243, 107, 0.28));
+    }
+
+    @keyframes floatSticker {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-4px) rotate(2deg); }
+    }
+
+    .pillar-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pillar-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      position: relative;
+      z-index: 1;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .task-list {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .task-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .task-item.done {
+      border-color: rgba(197, 243, 107, 0.5);
+      background: rgba(197, 243, 107, 0.07);
+      box-shadow: 0 0 18px rgba(197, 243, 107, 0.08);
+    }
+
+    .task-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .task-sticker {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .task-sticker img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+    }
+
+    .task-info h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .task-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .check-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(244, 243, 239, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .task-item.done .check-btn {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--text-dark);
+      transform: scale(1.06);
+    }
+
+    .primary-btn {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      background: var(--accent);
+      color: var(--text-dark);
+      border: none;
+      border-radius: 18px;
+      padding: 15px 18px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 26px rgba(197, 243, 107, 0.25);
+    }
+
+    .primary-btn:active {
+      transform: scale(0.98);
+    }
+
+    .dots-loader {
+      display: none;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .dots-loader.show {
+      display: inline-flex;
+    }
+
+    .dots-loader span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-dark);
+      animation: bounceDot 0.8s infinite ease-in-out;
+    }
+
+    .dots-loader span:nth-child(2) { animation-delay: 0.15s; }
+    .dots-loader span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bounceDot {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .lottie-panel {
+      position: relative;
+      z-index: 1;
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 16px;
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    .lottie-panel.show {
+      display: block;
+    }
+
+    .lottie-row {
+      display: flex;
+      justify-content: space-around;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 408px;
+      background: rgba(24, 27, 30, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 8px 12px;
+      display: flex;
+      justify-content: space-around;
+      z-index: 10;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 14px;
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      background: rgba(197, 243, 107, 0.14);
+      color: var(--accent);
+    }
+
+    .status-toast {
+      position: relative;
+      z-index: 1;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--accent);
+      text-align: center;
+      min-height: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <div class="app-container">
+    <header>
+      <div class="brand">
+        <img src="./logo.webp" alt="TARTIP" class="brand-logo" onerror="this.style.display='none'" />
+        <span class="brand-badge">TARTIP</span>
+        <span class="brand-title">28-Күн</span>
+      </div>
+      <div class="day-pill" id="dayIndicator">
+        <img src="./bolt.webp" alt="" class="mini-icon" onerror="this.style.display='none'" />
+        <span id="dayText">1 / 28 күн</span>
+      </div>
+    </header>
+
+    <section class="hero-card">
+      <div class="hero-top">
+        <span class="hero-label">Бүгінгі орындалу</span>
+        <span class="streak-tag">
+          <img src="./flame.webp" alt="" class="mini-icon" onerror="this.style.display='none'" />
+          <span>1 күн стрик</span>
+        </span>
+      </div>
+      <div class="progress-row">
+        <span class="progress-percent" id="progressPercent">0%</span>
+        <span class="progress-sub" id="progressCount">0 / 3 тапсырма</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </section>
+
+    <section class="pillars-grid">
+      <div class="pillar-card active" data-pillar="workout" onclick="selectPillar('workout', this)">
+        <div class="sticker-slot">
+          <img src="./dumbbell.webp" alt="Жаттығу" />
+        </div>
+        <div class="pillar-title">Жаттығу</div>
+        <div class="pillar-meta">Күш &amp; ырғақ</div>
+      </div>
+
+      <div class="pillar-card" data-pillar="food" onclick="selectPillar('food', this)">
+        <div class="sticker-slot">
+          <img src="./plate.webp" alt="Тамақ" />
+        </div>
+        <div class="pillar-title">Тамақ</div>
+        <div class="pillar-meta">Норма &amp; су</div>
+      </div>
+
+      <div class="pillar-card" data-pillar="sleep" onclick="selectPillar('sleep', this)">
+        <div class="sticker-slot">
+          <img src="./moon.webp" alt="Ұйқы" />
+        </div>
+        <div class="pillar-title">Ұйқы</div>
+        <div class="pillar-meta">Режим &amp; қалпы</div>
+      </div>
+    </section>
+
+    <div class="section-title">
+      <span>Бүгінгі чек-лист</span>
+      <span style="font-size: 12px; color: var(--text-muted);" id="activeFilterLabel">Барлық бағыт</span>
+    </div>
+
+    <div class="task-list" id="taskList">
+      <div class="task-item" data-id="t1" data-pillar="workout" onclick="toggleTask(this)">
+        <div class="task-left">
+          <div class="task-sticker">
+            <img src="./dumbbell-xl.webp" alt="" />
+          </div>
+          <div class="task-info">
+            <h4>Негізгі жаттығу сессиясы</h4>
+            <p>Жоспар бойынша базалық қозғалыс немесе кардио</p>
+          </div>
+        </div>
+        <div class="check-btn">✓</div>
+      </div>
+
+      <div class="task-item" data-id="t2" data-pillar="food" onclick="toggleTask(this)">
+        <div class="task-left">
+          <div class="task-sticker">
+            <img src="./water.webp" alt="" />
+          </div>
+          <div class="task-info">
+            <h4>Тамақ режимі &amp; су балансы</h4>
+            <p>Күндік ақуыз/калория және таза су нормасы</p>
+          </div>
+        </div>
+        <div class="check-btn">✓</div>
+      </div>
+
+      <div class="task-item" data-id="t3" data-pillar="sleep" onclick="toggleTask(this)">
+        <div class="task-left">
+          <div class="task-sticker">
+            <img src="./clock.webp" alt="" />
+          </div>
+          <div class="task-info">
+            <h4>Уақытылы ұйқыға жату</h4>
+            <p>Экранды азайтып, 7–8 сағаттық ұйқы терезесін сақтау</p>
+          </div>
+        </div>
+        <div class="check-btn">✓</div>
+      </div>
+    </div>
+
+    <button class="primary-btn" id="saveDayBtn" onclick="completeDay()">
+      <span id="btnText">Күнді бекіту</span>
+      <div class="dots-loader" id="btnLoader">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+
+    <div class="lottie-panel" id="lottiePanel">
+      <div style="font-size: 13px; font-weight: 700; color: var(--accent);">Lottie анимациялар</div>
+      <div class="lottie-row">
+        <dotlottie-wc src="./Check-In_Stream.lottie" autoplay loop style="width: 96px; height: 96px;"></dotlottie-wc>
+        <dotlottie-wc src="./Mood_Selector.lottie" autoplay loop style="width: 96px; height: 96px;"></dotlottie-wc>
+      </div>
+    </div>
+
+    <div class="status-toast" id="statusToast"></div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="setTab('today', this)">Бүгін</button>
+    <button class="nav-btn" onclick="setTab('plan28', this)">28 күн</button>
+    <button class="nav-btn" onclick="setTab('assets', this)">Анимация</button>
+  </nav>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    let currentDay = 1;
+
+    function updateProgress() {
+      const items = [...document.querySelectorAll('.task-item')];
+      const doneCount = items.filter(el => el.classList.contains('done')).length;
+      const total = items.length;
+      const pct = Math.round((doneCount / total) * 100);
+
+      document.getElementById('progressPercent').textContent = `${pct}%`;
+      document.getElementById('progressCount').textContent = `${doneCount} / ${total} тапсырма`;
+      document.getElementById('progressFill').style.width = `${pct}%`;
+    }
+
+    function toggleTask(el) {
+      el.classList.toggle('done');
+      updateProgress();
+      if (tg?.HapticFeedback) {
+        tg.HapticFeedback.impactOccurred('light');
+      }
+    }
+
+    function selectPillar(pillar, cardEl) {
+      document.querySelectorAll('.pillar-card').forEach(c => c.classList.remove('active'));
+      cardEl.classList.add('active');
+
+      const labels = {
+        workout: 'Жаттығу бағыты',
+        food: 'Тамақ бағыты',
+        sleep: 'Ұйқы бағыты'
+      };
+      document.getElementById('activeFilterLabel').textContent = labels[pillar] || 'Барлық бағыт';
+    }
+
+    function completeDay() {
+      const btnText = document.getElementById('btnText');
+      const loader = document.getElementById('btnLoader');
+      const toast = document.getElementById('statusToast');
+
+      btnText.textContent = 'Сақталуда';
+      loader.classList.add('show');
+
+      setTimeout(() => {
+        loader.classList.remove('show');
+        btnText.textContent = 'Күнді бекіту';
+
+        if (currentDay < 28) {
+          currentDay += 1;
+        }
+        document.getElementById('dayText').textContent = `${currentDay} / 28 күн`;
+        document.querySelectorAll('.task-item').forEach(el => el.classList.remove('done'));
+        updateProgress();
+
+        toast.textContent = `${currentDay}-күнге өттік. Прогресс жаңартылды.`;
+        if (tg?.HapticFeedback) {
+          tg.HapticFeedback.notificationOccurred('success');
+        }
+      }, 650);
+    }
+
+    function setTab(tab, btnEl) {
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+      const toast = document.getElementById('statusToast');
+      const panel = document.getElementById('lottiePanel');
+
+      if (tab === 'today') {
+        panel.classList.remove('show');
+        toast.textContent = 'Бүгінгі күнделікті тәртіп экраны';
+      } else if (tab === 'plan28') {
+        panel.classList.remove('show');
+        toast.textContent = '28 күндік кезең: 1-апта — базалық ырғақ пен режим';
+      } else if (tab === 'assets') {
+        panel.classList.add('show');
+        toast.textContent = 'Архивтегі .lottie файлдар қосылды';
+      }
+    }
+
+    updateProgress();
+  </script>
+</body>
+</html>
